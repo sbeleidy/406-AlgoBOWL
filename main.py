@@ -128,8 +128,23 @@ def randomAlg(n,k,points):
             sets.append(p[int(i*(n/k)):int(i*(n/k) + (n/k))])
     return sets
 
+def selectRandomStartingPoints(points, k):
+    return random.sample(range(len(points)), k)
 
+def getAllDistancesFromPoint(points, pointIndex):
+    return [getManhattan(points[pointIndex], i) for i in points]
 
+def getAllDistancesFromMultiplePoints(points, indexes):
+    return [[getManhattan(point, points[index]) for index in indexes ] for point in points]
+
+def getSetsFromStartingPoints(points, startingIndexes):
+    allDistances = getAllDistancesFromMultiplePoints(points, startingIndexes)
+    setIndex = [distances.index(min(distances)) for distances in allDistances]
+    
+    sets = [[] for i in range(len(startingIndexes))]
+    for i in range(len(points)):
+        sets[setIndex[i]].append(i) 
+    return sets
 
 def useAlgorithm(algorithm, n, k, points, runs):
     """
@@ -181,14 +196,14 @@ def testing():
     ## Spec Example
     ######
 
-    # # Get values from the spec sample
-    # n, k, points = getValsFromTxt("SpecSample.txt")
+    # Get values from the spec sample
+    n, k, points = getValsFromTxt("SpecSample.txt")
 
     # # Run algorithm for spec sample
     # bestScore, bestSet = useAlgorithm(randomAlg, n, k, points, 100)
 
-    # Plot the sample sets
-    plotSolutionSet(points, bestSet)
+    # # Plot the sample sets
+    # plotSolutionSet(points, bestSet)
 
     # # Print output of spec sample to a file
     # genOutVals("SpecSampleSolution.txt",bestScore, bestSet)
@@ -198,9 +213,9 @@ def testing():
     ######
 
     # Generate a sample input file then get its values and solve it and output the result in a file
-    genSample("mySample.txt")
-    sampleN, sampleK, samplePoints = getValsFromTxt("mySample.txt")
-    sampleScore, sampleSet = useAlgorithm(randomAlg, sampleN, sampleK, samplePoints, sampleN + 300)
+    # genSample("mySample.txt")
+    # sampleN, sampleK, samplePoints = getValsFromTxt("mySample.txt")
+    # sampleScore, sampleSet = useAlgorithm(randomAlg, sampleN, sampleK, samplePoints, sampleN + 300)
     # genOutVals("mySampleSolution.txt",sampleScore, sampleSet)
 
     # # Verify solution given k and points
@@ -215,7 +230,12 @@ def testing():
     # else:
     #     print("Invalid solution!")
 
-    plotSolutionSet(samplePoints, sampleSet)
+    # plotSolutionSet(samplePoints, sampleSet)
+
+    start = selectRandomStartingPoints(points, k)
+    sets = getSetsFromStartingPoints(points, start)
+
+    print(sets)
 
 testing()
 

@@ -150,6 +150,34 @@ def randomStartingPointAlgorithm(n,k,points):
     start = selectRandomStartingPoints(points, k)
     return getSetsFromStartingPoints(points, start)
 
+def iterativeStartingPointsAlgorithm(n,k,points):
+    start = selectRandomStartingPoints(points,k)
+    for i in range(0,20):
+        sets = getSetsFromStartingPoints(points,start)
+        start = getNewStart(points,sets,k)
+
+    return getSetsFromStartingPoints(points,start)
+
+def getNewStart(sets):
+    start = []
+    for aSet in sets:
+        start.append(findCentroid(aSet))
+    return start
+
+
+def findCentroid(aSet):
+    x = avearge(aSet, 0)
+    y = average(aSet, 1)
+    z = average(aSet, 2)
+    return [x,y,z]
+
+def average(points, coord):
+    total = 0
+    for point in points:
+        total += point[coord]
+    return total/len(points)
+
+
 def useAlgorithm(algorithm, n, k, points, runs):
     """
     A way to run an algorithm several times and get the best run score and best set
@@ -219,7 +247,7 @@ def testing():
     # Generate a sample input file then get its values and solve it and output the result in a file
     genSample("mySample.txt")
     sampleN, sampleK, samplePoints = getValsFromTxt("mySample.txt")
-    sampleScore, sampleSet = useAlgorithm(randomStartingPointAlgorithm, sampleN, sampleK, samplePoints, sampleN + 300)
+    sampleScore, sampleSet = useAlgorithm(iterativeStartingPointAlgorithm, sampleN, sampleK, samplePoints, 10)
     genOutVals("mySampleSolution.txt",sampleScore, sampleSet)
 
     # # Verify solution given k and points

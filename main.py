@@ -165,7 +165,7 @@ def useAlgorithm(algorithm, n, k, points, runs):
     return bestScore, bestSet
 
 
-def plotSolutionSet(points, set):
+def plotSolutionSet(points, set=None):
     """
     Plot the points of each set with the same color on a 3d graph
     """
@@ -178,9 +178,11 @@ def plotSolutionSet(points, set):
 
     colors = [0] * len(points)
 
-    for i in range(len(set)):
-        for j in range(len(set[i])):
-            colors[set[i][j]] = i
+    if set != None:
+        for i in range(len(set)):
+            for j in range(len(set[i])):
+                colors[set[i][j]] = i
+    
     m = "o"
 
     ax.scatter(xs, ys, zs, c=colors, marker=m)
@@ -191,7 +193,52 @@ def plotSolutionSet(points, set):
 
     plt.show()
 
+def genToughPoint():
+    denseOrNarrow = random.randint(0,1)
 
+    if denseOrNarrow == 0:
+
+        return str(random.randint(500,700))+ " " + str(random.randint(500,700)) + " " + str(random.randint(500,700)) + "\n"
+    x = random.randint(2,5)
+    y = random.randint(2,5)
+    z = random.randint(2,5)
+    # result = {
+    #     '0': random.randint(800,1000),
+    #     '1': random.randint(400,600),
+    #     '2': random.randint(00,600),
+    #     '3': random.randint(500,600),
+    #     '4': random.randint(100,200),
+    #     '5': random.randint(-50,50),
+    #     '6': random.randint(-200,-100),
+    #     '7': random.randint(-600,-500),
+    #     '8': random.randint(-600,-500),
+    #     '9': random.randint(-800,-700),
+    #     '10': random.randint(-1000,-900)
+    # }
+    # result = {
+    #     '0': random.randint(500,1000),
+    #     '1': random.randint(-1000,-500)
+    # }
+
+    result = {
+        '2': lambda x: random.randint(-100,100),
+        '3': lambda x: random.randint(-1000,-900),
+        '4': lambda x: random.randint(900,1000),
+        '5': lambda x: random.randint(500,700)
+    }
+
+    return str(result[str(x)](1))+ " " + str(result[str(y)](1)) + " " + str(result[str(z)](1)) + "\n"
+
+def genToughSample(fileName):
+    n = 999
+    k = 19
+    points = [genToughPoint() for i in range(n)]
+
+    linesToPrint = [str(n) + "\n"] + [str(k) + "\n"] + points
+
+    fo = open(fileName, "w")
+    fo.writelines(linesToPrint)
+    fo.close()
 
 
 def testing():
@@ -216,11 +263,11 @@ def testing():
     ## Generated Sample
     ######
 
-    # Generate a sample input file then get its values and solve it and output the result in a file
-    genSample("mySample.txt")
-    sampleN, sampleK, samplePoints = getValsFromTxt("mySample.txt")
-    sampleScore, sampleSet = useAlgorithm(randomStartingPointAlgorithm, sampleN, sampleK, samplePoints, sampleN + 300)
-    genOutVals("mySampleSolution.txt",sampleScore, sampleSet)
+    # # Generate a sample input file then get its values and solve it and output the result in a file
+    # genSample("mySample.txt")
+    # sampleN, sampleK, samplePoints = getValsFromTxt("mySample.txt")
+    # sampleScore, sampleSet = useAlgorithm(randomStartingPointAlgorithm, sampleN, sampleK, samplePoints, sampleN + 300)
+    # genOutVals("mySampleSolution.txt",sampleScore, sampleSet)
 
     # # Verify solution given k and points
     # if verifySolution(sampleK, samplePoints, "mySampleSolution.txt"):
@@ -234,9 +281,15 @@ def testing():
     # else:
     #     print("Invalid solution!")
 
-    plotSolutionSet(samplePoints, sampleSet)
+    # plotSolutionSet(samplePoints, sampleSet)
 
+    ## Tough sample
+    genToughSample("toughSample.txt")
+    toughN, toughK, toughPoints = getValsFromTxt("toughSample.txt")
+    toughScore, toughSet = useAlgorithm(randomStartingPointAlgorithm, toughN, toughK, toughPoints, 100)
+    genOutVals("toughSampleSolution.txt",toughScore, toughSet)
+    plotSolutionSet(toughPoints, toughSet)
 
-
+    # genToughPoint()
 
 testing()

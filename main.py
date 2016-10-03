@@ -194,14 +194,14 @@ def plotSolutionSet(points, set=None):
     plt.show()
 
 def genToughPoint():
-    denseOrNarrow = random.randint(0,1)
+    # denseOrNarrow = random.randint(0,1)
 
-    if denseOrNarrow == 0:
+    # if denseOrNarrow == 0:
 
-        return str(random.randint(500,700))+ " " + str(random.randint(500,700)) + " " + str(random.randint(500,700)) + "\n"
-    x = random.randint(2,5)
-    y = random.randint(2,5)
-    z = random.randint(2,5)
+    #     return str(random.randint(500,700))+ " " + str(random.randint(500,700)) + " " + str(random.randint(500,700)) + "\n"
+    x = random.randint(0,1)
+    y = random.randint(0,1)
+    z = random.randint(0,1)
     # result = {
     #     '0': random.randint(800,1000),
     #     '1': random.randint(400,600),
@@ -215,17 +215,17 @@ def genToughPoint():
     #     '9': random.randint(-800,-700),
     #     '10': random.randint(-1000,-900)
     # }
-    # result = {
-    #     '0': random.randint(500,1000),
-    #     '1': random.randint(-1000,-500)
-    # }
-
     result = {
-        '2': lambda x: random.randint(-100,100),
-        '3': lambda x: random.randint(-1000,-900),
-        '4': lambda x: random.randint(900,1000),
-        '5': lambda x: random.randint(500,700)
+        '0': lambda x: random.randint(500,1000),
+        '1': lambda x: random.randint(-1000,-500)
     }
+
+    # result = {
+    #     '2': lambda x: random.randint(-100,100),
+    #     '3': lambda x: random.randint(-1000,-900),
+    #     '4': lambda x: random.randint(900,1000),
+    #     '5': lambda x: random.randint(500,700)
+    # }
 
     return str(result[str(x)](1))+ " " + str(result[str(y)](1)) + " " + str(result[str(z)](1)) + "\n"
 
@@ -284,7 +284,6 @@ def testing():
     # plotSolutionSet(samplePoints, sampleSet)
 
     ## Tough sample
-    genToughSample("toughSample.txt")
     toughN, toughK, toughPoints = getValsFromTxt("toughSample.txt")
     toughScore, toughSet = useAlgorithm(randomStartingPointAlgorithm, toughN, toughK, toughPoints, 100)
     genOutVals("toughSampleSolution.txt",toughScore, toughSet)

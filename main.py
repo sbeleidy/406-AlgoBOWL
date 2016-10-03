@@ -283,8 +283,19 @@ def genToughPoint():
 
 def genToughSample(fileName):
     n = 999
-    k = 19
-    points = [genToughPoint() for i in range(n)]
+    k = 15
+    toughPoints = [
+        "0 0 0\n","1 1 1\n",
+        "500 0 500\n", "501 1 501\n",
+        "0 500 500\n", "1 501 501\n",
+        "500 500 0\n", "501 501 1\n",
+        "-500 0 -500\n", "-501 1 -501\n"
+        "0 -500 -500\n", "1 -501 -501\n"
+        "-500 -500 0\n", "-501 -501 1\n"
+    ]
+    points = toughPoints + [genToughPoint() for i in range(n-len(toughPoints))]
+
+    print(len(points))
 
     linesToPrint = [str(n) + "\n"] + [str(k) + "\n"] + points
 
@@ -348,4 +359,4 @@ def testing():
 
     # genToughPoint()
 
-testing()
+# testing()

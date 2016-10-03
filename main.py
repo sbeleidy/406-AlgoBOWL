@@ -131,11 +131,17 @@ def randomAlg(n,k,points):
 def selectRandomStartingPoints(points, k):
     return random.sample(range(len(points)), k)
 
+def selectRandomStartingCoords(points, k):
+    return random.sample(points, k)
+
 def getAllDistancesFromPoint(points, pointIndex):
     return [getManhattan(points[pointIndex], i) for i in points]
 
 def getAllDistancesFromMultiplePoints(points, indexes):
     return [[getManhattan(point, points[index]) for index in indexes ] for point in points]
+
+def getAllDistancesFromCoords(points, coords):
+    return [[getManhattan(point, coord) for coord in coords ] for point in points]
 
 def getSetsFromStartingPoints(points, startingIndexes):
     allDistances = getAllDistancesFromMultiplePoints(points, startingIndexes)
@@ -146,27 +152,45 @@ def getSetsFromStartingPoints(points, startingIndexes):
         sets[setIndex[i]].append(i) 
     return sets
 
+def getSetsFromStartingCoords(points, startingCoords):
+    allDistances = getAllDistancesFromCoords(points, startingCoords)
+    setIndex = [distances.index(min(distances)) for distances in allDistances]
+    
+    sets = [[] for i in range(len(startingCoords))]
+    for i in range(len(points)):
+        sets[setIndex[i]].append(i) 
+    return sets
+
 def randomStartingPointAlgorithm(n,k,points):
     start = selectRandomStartingPoints(points, k)
     return getSetsFromStartingPoints(points, start)
 
 def iterativeStartingPointsAlgorithm(n,k,points):
-    start = selectRandomStartingPoints(points,k)
-    for i in range(0,20):
-        sets = getSetsFromStartingPoints(points,start)
-        start = getNewStart(points,sets,k)
+    start = selectRandomStartingCoords(points,k)
+    bestSet = getSetsFromStartingCoords(points,start)
+    bestScore = getSetsScore(points, bestSet)
 
-    return getSetsFromStartingPoints(points,start)
+    newSet = bestSet
 
-def getNewStart(sets):
+    for i in range(200):
+        start = getNewStart(points, newSet)
+        newSet = getSetsFromStartingCoords(points,start)
+        newScore = getSetsScore(points, newSet)
+        if newScore < bestScore:
+            bestSet = newSet
+            bestScore = newScore
+
+    return bestSet
+
+def getNewStart(points, sets):
     start = []
     for aSet in sets:
-        start.append(findCentroid(aSet))
+        start.append(findCentroid([points[i] for i in aSet]))
     return start
 
 
 def findCentroid(aSet):
-    x = avearge(aSet, 0)
+    x = average(aSet, 0)
     y = average(aSet, 1)
     z = average(aSet, 2)
     return [x,y,z]
@@ -247,7 +271,7 @@ def testing():
     # Generate a sample input file then get its values and solve it and output the result in a file
     genSample("mySample.txt")
     sampleN, sampleK, samplePoints = getValsFromTxt("mySample.txt")
-    sampleScore, sampleSet = useAlgorithm(iterativeStartingPointAlgorithm, sampleN, sampleK, samplePoints, 10)
+    sampleScore, sampleSet = useAlgorithm(iterativeStartingPointsAlgorithm, sampleN, sampleK, samplePoints, 10)
     genOutVals("mySampleSolution.txt",sampleScore, sampleSet)
 
     # # Verify solution given k and points

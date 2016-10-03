@@ -146,6 +146,10 @@ def getSetsFromStartingPoints(points, startingIndexes):
         sets[setIndex[i]].append(i) 
     return sets
 
+def randomStartingPointAlgorithm(n,k,points):
+    start = selectRandomStartingPoints(points, k)
+    return getSetsFromStartingPoints(points, start)
+
 def useAlgorithm(algorithm, n, k, points, runs):
     """
     A way to run an algorithm several times and get the best run score and best set
@@ -213,10 +217,10 @@ def testing():
     ######
 
     # Generate a sample input file then get its values and solve it and output the result in a file
-    # genSample("mySample.txt")
-    # sampleN, sampleK, samplePoints = getValsFromTxt("mySample.txt")
-    # sampleScore, sampleSet = useAlgorithm(randomAlg, sampleN, sampleK, samplePoints, sampleN + 300)
-    # genOutVals("mySampleSolution.txt",sampleScore, sampleSet)
+    genSample("mySample.txt")
+    sampleN, sampleK, samplePoints = getValsFromTxt("mySample.txt")
+    sampleScore, sampleSet = useAlgorithm(randomStartingPointAlgorithm, sampleN, sampleK, samplePoints, sampleN + 300)
+    genOutVals("mySampleSolution.txt",sampleScore, sampleSet)
 
     # # Verify solution given k and points
     # if verifySolution(sampleK, samplePoints, "mySampleSolution.txt"):
@@ -230,12 +234,9 @@ def testing():
     # else:
     #     print("Invalid solution!")
 
-    # plotSolutionSet(samplePoints, sampleSet)
+    plotSolutionSet(samplePoints, sampleSet)
 
-    start = selectRandomStartingPoints(points, k)
-    sets = getSetsFromStartingPoints(points, start)
 
-    print(sets)
+
 
 testing()
-

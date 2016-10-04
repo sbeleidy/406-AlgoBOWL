@@ -6,6 +6,8 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
+import os
+
 def getValsFromTxt(fileName):
     """
     Returns n, k and a list of points from a file
@@ -18,7 +20,7 @@ def getValsFromTxt(fileName):
     points = lines[2:]
     pointList = []
     for point in points:
-        p = [int(val) for val in point.rstrip('\n').split(" ")]
+        p = [int(val) for val in point.rstrip('\n').rstrip(" ").split(" ")]
         pointList.append(p)
     
     return int(n), int(k), pointList
@@ -42,6 +44,7 @@ def genOutVals(filename, distance, pointSets):
     """
     Creates output file with provided results
     """
+    [set.sort() for set in pointSets]
     pointLines = [" ".join(map(lambda x: str(x+1),point)) for point in pointSets]
     lines = [distance] + pointLines
     linesToPrint = [str(l)+"\n" for l in lines]
@@ -286,8 +289,45 @@ def genToughSample(fileName):
 
 # genToughSample("toughSample.txt")
 
+def solve(n, k, points):
+
+    bestScore = 10000000
+    bestSets = []
+    winningAlgorithm = "NA"
+
+    ## General Random Algorithm
+    randomScore, randomSets = useAlgorithm(randomAlg, n, k, points, 1000)
+    if randomScore < bestScore:
+        bestScore = randomScore
+        bestSets = randomSets
+        winningAlgorithm = "General Random"
+
+    ## Nearest Neighbor Random Start
+    nnRandomScore, nnRandomSets = useAlgorithm(randomStartingPointAlgorithm, n, k, points, 1000)
+    if nnRandomScore < bestScore:
+        bestScore = nnRandomScore
+        bestSets = nnRandomSets
+        winningAlgorithm = "NN Random Start"
+
+
+    return bestScore, bestSets, winningAlgorithm
+
+def solveFile(fileName):
+    n, k, points = getValsFromTxt(fileName)
+    bestScore, bestSet, winner = solve(n,k,points)
+    genOutVals("solutions/solution-"+fileName.lstrip("group_inputs/input_"), bestScore, bestSet)
+
+    print("{} was solved with {}.".format(fileName,winner))
+
+def solveAllTheThings():
+
+    for fileName in os.listdir("group_inputs"):
+        if fileName.endswith(".txt"):
+            solveFile("group_inputs/"+fileName)
+
 def testing():
 
+    print("testing")
     ######
     ## Spec Example
     ######
@@ -342,3 +382,5 @@ def testing():
     # genToughPoint()
 
 # testing()
+
+# solveAllTheThings()

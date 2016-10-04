@@ -289,13 +289,17 @@ def genToughSample(fileName):
         "500 0 500\n", "501 1 501\n",
         "0 500 500\n", "1 501 501\n",
         "500 500 0\n", "501 501 1\n",
-        "-500 0 -500\n", "-501 1 -501\n"
-        "0 -500 -500\n", "1 -501 -501\n"
+        "-500 0 -500\n", "-501 1 -501\n",
+        "0 -500 -500\n", "1 -501 -501\n",
         "-500 -500 0\n", "-501 -501 1\n"
     ]
-    points = toughPoints + [genToughPoint() for i in range(n-len(toughPoints))]
+    generalPoints = [genToughPoint() for i in range(n-len(toughPoints))]
 
-    print(len(points))
+    points = generalPoints + toughPoints
+
+    random.shuffle(points)
+
+    points[-1] = points[-1].rstrip('\n')
 
     linesToPrint = [str(n) + "\n"] + [str(k) + "\n"] + points
 
@@ -303,6 +307,7 @@ def genToughSample(fileName):
     fo.writelines(linesToPrint)
     fo.close()
 
+# genToughSample("toughSample.txt")
 
 def testing():
 

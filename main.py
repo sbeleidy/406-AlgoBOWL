@@ -519,6 +519,6 @@ def testing():
 
 # testing()
 
-solveAllTheThings(skip=True)
+# solveAllTheThings(skip=True)
 
 # plotGroup(2)

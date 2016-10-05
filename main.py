@@ -24,7 +24,7 @@ def getValsFromTxt(fileName):
     for point in points:
         p = [int(val) for val in point.rstrip('\n').rstrip(" ").split(" ")]
         pointList.append(p)
-    
+
     return int(n), int(k), pointList
 
 
@@ -50,7 +50,7 @@ def genOutVals(filename, distance, pointSets):
     pointLines = [" ".join(map(lambda x: str(x+1),point)) for point in pointSets]
     lines = [distance] + pointLines
     linesToPrint = [str(l)+"\n" for l in lines]
-    
+
     fo = open(filename, "w")
     fo.writelines(linesToPrint)
     fo.close()
@@ -78,7 +78,7 @@ def verifySolution(k, points, filename):
     Checks whether the solution provided in file is valid for points
     """
     solutionScore, solutionSet = getSolutionVals(filename)
-    ## TODO: need to check whether a point was used twice 
+    ## TODO: need to check whether a point was used twice
     return solutionScore == getSetsScore(points, solutionSet) and len(solutionSet) == k
 
 def verifyInputOutputFileCombination(inputFile, outputFile):
@@ -205,19 +205,19 @@ def getAllDistancesFromCoords(points, coords):
 def getSetsFromStartingPoints(points, startingIndexes):
     allDistances = getAllDistancesFromMultiplePoints(points, startingIndexes)
     setIndex = [distances.index(min(distances)) for distances in allDistances]
-    
+
     sets = [[] for i in range(len(startingIndexes))]
     for i in range(len(points)):
-        sets[setIndex[i]].append(i) 
+        sets[setIndex[i]].append(i)
     return sets
 
 def getSetsFromStartingCoords(points, startingCoords):
     allDistances = getAllDistancesFromCoords(points, startingCoords)
     setIndex = [distances.index(min(distances)) for distances in allDistances]
-    
+
     sets = [[] for i in range(len(startingCoords))]
     for i in range(len(points)):
-        sets[setIndex[i]].append(i) 
+        sets[setIndex[i]].append(i)
     return sets
 
 def randomStartingPointAlgorithm(n,k,points):
@@ -307,7 +307,7 @@ def plotSolutionSet(points, set=None):
         for i in range(len(set)):
             for j in range(len(set[i])):
                 colors[set[i][j]] = i
-    
+
     m = "o"
 
     ax.scatter(xs, ys, zs, c=colors, marker=m)
@@ -323,7 +323,7 @@ def genToughPoint():
     x = random.randint(0,1)
     y = random.randint(0,1)
     z = random.randint(0,1)
-    
+
     result = {
         '0': lambda x: random.randint(500,1000),
         '1': lambda x: random.randint(-1000,-500)
@@ -407,7 +407,7 @@ def solve(n, k, points):
             bestSets = iterativeGoodSets
             winningAlgorithm = "Iterative Good Start - " + algName
         print("Iterative Good Start - {} took {} seconds".format(algName, str(time.clock() - start)))
-        
+
         ## Iterative Nearest Neighbor Random Good Start
         start = time.clock()
         for i in range(10):

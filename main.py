@@ -410,7 +410,7 @@ def solve(n, k, points):
         
         ## Iterative Nearest Neighbor Random Good Start
         start = time.clock()
-        for i in range(50):
+        for i in range(10):
             iterativeRandomGoodScore, iterativeRandomGoodSets = iterateAlgorithm(n, k, points, selectGoodStartingCoords(k, True), iteratorAlgorithms[algName], 100)
             if iterativeRandomGoodScore < bestScore:
                 bestScore = iterativeRandomGoodScore

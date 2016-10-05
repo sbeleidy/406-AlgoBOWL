@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 
 import os
 
+import time
+
 def getValsFromTxt(fileName):
     """
     Returns n, k and a list of points from a file
@@ -57,16 +59,19 @@ def getSolutionVals(fileName):
     """
     Gets the best score and set from a file
     """
-    fo = open(fileName, "r")
-    lines = fo.readlines()
-    fo.close()
-    bestScore = int(lines[0])
-    bestSet = []
-    sets = lines[1:]
-    for set in sets:
-        p = [int(val)-1 for val in set.rstrip('\n').split(" ")]
-        bestSet.append(p)
-    return bestScore, bestSet
+    try:
+        fo = open(fileName, "r")
+        lines = fo.readlines()
+        fo.close()
+        bestScore = int(lines[0])
+        bestSet = []
+        sets = lines[1:]
+        for set in sets:
+            p = [int(val)-1 for val in set.rstrip('\n').split(" ")]
+            bestSet.append(p)
+        return bestScore, bestSet
+    except:
+        return False, False
 
 def verifySolution(k, points, filename):
     """
@@ -248,9 +253,13 @@ def findGeometricCenter(set):
     ys = [p[1] for p in set]
     zs = [p[2] for p in set]
 
-    centerX = abs(max(xs) - min(xs)) + min(xs)
-    centerY = abs(max(ys) - min(ys)) + min(ys)
-    centerZ = abs(max(zs) - min(zs)) + min(zs)
+    minX = min(xs)
+    minY = min(ys)
+    minZ = min(zs)
+
+    centerX = abs(max(xs) - minX)/2 + minX
+    centerY = abs(max(ys) - minY)/2 + minY
+    centerZ = abs(max(zs) - minZ)/2 + minZ
 
     return [centerX, centerY, centerZ]
 
@@ -357,18 +366,22 @@ def solve(n, k, points):
     winningAlgorithm = "NA"
 
     ## General Random Algorithm
+    start = time.clock()
     randomScore, randomSets = useAlgorithm(randomAlg, n, k, points, 1000)
     if randomScore < bestScore:
         bestScore = randomScore
         bestSets = randomSets
         winningAlgorithm = "General Random"
+    print("General Random took {} seconds".format(str(time.clock() - start)))
 
     ## Nearest Neighbor Random Start
+    start = time.clock()
     nnRandomScore, nnRandomSets = useAlgorithm(randomStartingPointAlgorithm, n, k, points, 1000)
     if nnRandomScore < bestScore:
         bestScore = nnRandomScore
         bestSets = nnRandomSets
         winningAlgorithm = "NN Random Start"
+    print("NN Random Start took {} seconds".format(str(time.clock() - start)))
 
     iteratorAlgorithms = {
         'Mean': findMean,
@@ -377,47 +390,71 @@ def solve(n, k, points):
 
     for algName in iteratorAlgorithms:
         ## Iterative Nearest Neighbor Random Start
-        for i in range(1000):
-            iterativeRandomScore, iterativeRandomSets = iterateAlgorithm(n, k, points, selectRandomStartingCoords(points, k), iteratorAlgorithms[algName], 200)
+        start = time.clock()
+        for i in range(50):
+            iterativeRandomScore, iterativeRandomSets = iterateAlgorithm(n, k, points, selectRandomStartingCoords(points, k), iteratorAlgorithms[algName], 100)
             if iterativeRandomScore < bestScore:
                 bestScore = iterativeRandomScore
                 bestSets = iterativeRandomSets
-                winningAlgorithm = "Iterative Random Start - " + algName 
+                winningAlgorithm = "Iterative Random Start - " + algName
+        print("Iterative Random Start - {} took {} seconds".format(algName, str(time.clock() - start)))
 
         ## Iterative Nearest Neighbor Good Start
-        iterativeGoodScore, iterativeGoodSets = iterateAlgorithm(n, k, points, selectGoodStartingCoords(k), iteratorAlgorithms[algName], 200)
+        start = time.clock()
+        iterativeGoodScore, iterativeGoodSets = iterateAlgorithm(n, k, points, selectGoodStartingCoords(k), iteratorAlgorithms[algName], 100)
         if iterativeGoodScore < bestScore:
             bestScore = iterativeGoodScore
             bestSets = iterativeGoodSets
             winningAlgorithm = "Iterative Good Start - " + algName
+        print("Iterative Good Start - {} took {} seconds".format(algName, str(time.clock() - start)))
         
         ## Iterative Nearest Neighbor Random Good Start
-        for i in range(200):
-            iterativeRandomGoodScore, iterativeRandomGoodSets = iterateAlgorithm(n, k, points, selectGoodStartingCoords(k, True), iteratorAlgorithms[algName], 200)
+        start = time.clock()
+        for i in range(50):
+            iterativeRandomGoodScore, iterativeRandomGoodSets = iterateAlgorithm(n, k, points, selectGoodStartingCoords(k, True), iteratorAlgorithms[algName], 100)
             if iterativeRandomGoodScore < bestScore:
                 bestScore = iterativeRandomGoodScore
                 bestSets = iterativeRandomGoodSets
                 winningAlgorithm = "Iterative Random Good Start - " + algName
+        print("Iterative Random Good Start - {} took {} seconds".format(algName, str(time.clock() - start)))
 
     return bestScore, bestSets, winningAlgorithm
 
 def solveFile(fileName):
+    start = time.clock()
     n, k, points = getValsFromTxt(fileName)
     bestScore, bestSet, winner = solve(n,k,points)
-    genOutVals("solutions/solution-"+fileName.lstrip("group_inputs/input_"), bestScore, bestSet)
 
-    print("{} was solved with {}.".format(fileName,winner))
+    currentScore, currentSet = getSolutionVals("solutions/solution-"+fileName.lstrip("group_inputs/input_"))
+
+    if currentScore:
+        print("Got here")
+        if bestScore < currentScore:
+            print("New Score Better")
+            genOutVals("solutions/solution-"+fileName.lstrip("group_inputs/input_"), bestScore, bestSet)
+    else:
+        genOutVals("solutions/solution-"+fileName.lstrip("group_inputs/input_"), bestScore, bestSet)
+
+    print("{} was solved with {} in {} seconds.".format(fileName, winner, str(time.clock() - start)))
 
 def plotGroup(n):
     score, sets = getSolutionVals("solutions/solution-"+str(n)+".txt")
     n, k, points = getValsFromTxt("group_inputs/input_group"+str(n)+".txt")
     plotSolutionSet(points, sets)
 
-def solveAllTheThings():
+def solveAllTheThings(skip=False):
 
     for fileName in os.listdir("group_inputs"):
         if fileName.endswith(".txt"):
-            solveFile("group_inputs/"+fileName)
+            print("Starting on" + fileName)
+            if skip:
+                currentScore, currentSet = getSolutionVals("solutions/solution-"+fileName.lstrip("group_inputs/input_"))
+                if currentScore:
+                    print("Solution for {} already exists. Skipping.".format(fileName))
+                else:
+                    solveFile("group_inputs/"+str(fileName))
+            else:
+                solveFile("group_inputs/"+str(fileName))
 
 def testing():
 
@@ -477,6 +514,6 @@ def testing():
 
 # testing()
 
-# solveAllTheThings()
+solveAllTheThings(skip=True)
 
 # plotGroup(2)

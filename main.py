@@ -137,6 +137,57 @@ def selectRandomStartingPoints(points, k):
 def selectRandomStartingCoords(points, k):
     return random.sample(points, k)
 
+def selectGoodStartingCoords(k, r=False):
+    goodPoints = [
+        [500, 500, 500],
+        [-500, -500, -500],
+        [0, 0, 0],
+        [500, 0 ,500],
+        [500, 500, 0],
+        [0, 500, 500],
+        [-500, 0 ,-500],
+        [-500, -500, 0],
+        [0, -500, -500],
+        [0, 0, 500],
+        [0, 500, 0],
+        [500, 0, 0],
+        [0, 0, -500],
+        [0, -500, 0],
+        [-500, 0, 0],
+        [750, 750, 750],
+        [-750, -750, -750],
+        [750, 0, 750],
+        [750, 750, 0],
+        [0, 750, 750],
+        [750, 0, 0],
+        [0, 750, 0],
+        [0, 0, 750],
+        [-750, 0, -750],
+        [-750, -750, 0],
+        [0, -750, -750],
+        [-750, 0, 0],
+        [0, -750, 0],
+        [0, 0, -750],
+        [250, 250, 250],
+        [-250, -250, -250],
+        [250, 0, 250],
+        [250, 250, 0],
+        [0, 250, 250],
+        [250, 0, 0],
+        [0, 250, 0],
+        [0, 0, 250],
+        [-250, 0, -250],
+        [-250, -250, 0],
+        [0, -250, -250],
+        [-250, 0, 0],
+        [0, -250, 0],
+        [0, 0, -250]
+    ]
+    if r:
+        return random.sample(goodPoints,k)
+    else:
+        return goodPoints[0:k]
+
 def getAllDistancesFromPoint(points, pointIndex):
     return [getManhattan(points[pointIndex], i) for i in points]
 
@@ -168,41 +219,51 @@ def randomStartingPointAlgorithm(n,k,points):
     start = selectRandomStartingPoints(points, k)
     return getSetsFromStartingPoints(points, start)
 
-def iterativeStartingPointsAlgorithm(n,k,points):
-    start = selectRandomStartingCoords(points,k)
-    bestSet = getSetsFromStartingCoords(points,start)
-    bestScore = getSetsScore(points, bestSet)
+def iterateAlgorithm(n,k,points, start, iteratorAlg, iterations):
+    bestSets = getSetsFromStartingCoords(points,start)
+    bestScore = getSetsScore(points, bestSets)
 
-    newSet = bestSet
+    newSets = bestSets
 
-    for i in range(200):
-        start = getNewStart(points, newSet)
-        newSet = getSetsFromStartingCoords(points,start)
-        newScore = getSetsScore(points, newSet)
+    for i in range(iterations):
+        start = getNewStart(points, newSets, iteratorAlg)
+        newSets = getSetsFromStartingCoords(points, start)
+        newScore = getSetsScore(points, newSets)
         if newScore < bestScore:
-            bestSet = newSet
+            bestSets = newSets
             bestScore = newScore
 
-    return bestSet
+    return bestScore, bestSets
 
-def getNewStart(points, sets):
+def getNewStart(points, sets, alg):
     start = []
     for aSet in sets:
-        start.append(findCentroid([points[i] for i in aSet]))
+        if len(aSet) >=2:
+            start.append(alg([points[i] for i in aSet]))
     return start
 
 
-def findCentroid(aSet):
-    x = average(aSet, 0)
-    y = average(aSet, 1)
-    z = average(aSet, 2)
-    return [x,y,z]
+def findGeometricCenter(set):
+    xs = [p[0] for p in set]
+    ys = [p[1] for p in set]
+    zs = [p[2] for p in set]
 
-def average(points, coord):
-    total = 0
-    for point in points:
-        total += point[coord]
-    return total/len(points)
+    centerX = abs(max(xs) - min(xs)) + min(xs)
+    centerY = abs(max(ys) - min(ys)) + min(ys)
+    centerZ = abs(max(zs) - min(zs)) + min(zs)
+
+    return [centerX, centerY, centerZ]
+
+def findMean(set):
+    xs = [p[0] for p in set]
+    ys = [p[1] for p in set]
+    zs = [p[2] for p in set]
+
+    meanX = sum(xs)/len(xs)
+    meanY = sum(ys)/len(ys)
+    meanZ = sum(zs)/len(zs)
+
+    return [meanX, meanY, meanZ]
 
 
 def useAlgorithm(algorithm, n, k, points, runs):
@@ -309,6 +370,34 @@ def solve(n, k, points):
         bestSets = nnRandomSets
         winningAlgorithm = "NN Random Start"
 
+    iteratorAlgorithms = {
+        'Mean': findMean,
+        'Geometric Center': findGeometricCenter
+    }
+
+    for algName in iteratorAlgorithms:
+        ## Iterative Nearest Neighbor Random Start
+        for i in range(1000):
+            iterativeRandomScore, iterativeRandomSets = iterateAlgorithm(n, k, points, selectRandomStartingCoords(points, k), iteratorAlgorithms[algName], 200)
+            if iterativeRandomScore < bestScore:
+                bestScore = iterativeRandomScore
+                bestSets = iterativeRandomSets
+                winningAlgorithm = "Iterative Random Start - " + algName 
+
+        ## Iterative Nearest Neighbor Good Start
+        iterativeGoodScore, iterativeGoodSets = iterateAlgorithm(n, k, points, selectGoodStartingCoords(k), iteratorAlgorithms[algName], 200)
+        if iterativeGoodScore < bestScore:
+            bestScore = iterativeGoodScore
+            bestSets = iterativeGoodSets
+            winningAlgorithm = "Iterative Good Start - " + algName
+        
+        ## Iterative Nearest Neighbor Random Good Start
+        for i in range(200):
+            iterativeRandomGoodScore, iterativeRandomGoodSets = iterateAlgorithm(n, k, points, selectGoodStartingCoords(k, True), iteratorAlgorithms[algName], 200)
+            if iterativeRandomGoodScore < bestScore:
+                bestScore = iterativeRandomGoodScore
+                bestSets = iterativeRandomGoodSets
+                winningAlgorithm = "Iterative Random Good Start - " + algName
 
     return bestScore, bestSets, winningAlgorithm
 
@@ -318,6 +407,11 @@ def solveFile(fileName):
     genOutVals("solutions/solution-"+fileName.lstrip("group_inputs/input_"), bestScore, bestSet)
 
     print("{} was solved with {}.".format(fileName,winner))
+
+def plotGroup(n):
+    score, sets = getSolutionVals("solutions/solution-"+str(n)+".txt")
+    n, k, points = getValsFromTxt("group_inputs/input_group"+str(n)+".txt")
+    plotSolutionSet(points, sets)
 
 def solveAllTheThings():
 
@@ -384,3 +478,5 @@ def testing():
 # testing()
 
 # solveAllTheThings()
+
+# plotGroup(2)

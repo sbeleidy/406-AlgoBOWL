@@ -3,8 +3,8 @@ import itertools
 import random
 
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
+#from mpl_toolkits.mplot3d import Axes3D
+#import matplotlib.pyplot as plt
 
 import os
 
@@ -119,6 +119,11 @@ def getSetsScore(points,sets):
         if dist > maxDistance:
             maxDistance = dist
     return maxDistance
+
+#def toughSolution(n, k, points):
+#    for point in points:
+#        if point[0] >500 and point[1] > 500
+
 
 def randomAlg(n,k,points):
     """

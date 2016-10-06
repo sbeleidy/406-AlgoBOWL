@@ -461,6 +461,21 @@ def solveAllTheThings(skip=False):
             else:
                 solveFile("group_inputs/"+str(fileName))
 
+def verifyAllTheThings():
+
+    n,k,points = getValsFromTxt("toughSample.txt")
+
+    for fileName in os.listdir("group_outputs"):
+        if fileName.endswith(".txt"):
+            # print("Starting on " + fileName)
+            try:
+                if verifySolution(k, points,"group_outputs/"+fileName):
+                    print("{} was good".format(fileName))
+                else:
+                    print("{} was bad".format(fileName))
+            except:
+                print("{} crashed".format(fileName))
+
 def testing():
 
     print("testing")
@@ -519,6 +534,8 @@ def testing():
 
 # testing()
 
-solveAllTheThings(skip=True)
+# solveAllTheThings(skip=True)
 
 # plotGroup(2)
+
+verifyAllTheThings()

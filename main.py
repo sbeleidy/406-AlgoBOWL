@@ -67,7 +67,7 @@ def getSolutionVals(fileName):
         bestSet = []
         sets = lines[1:]
         for set in sets:
-            p = [int(val)-1 for val in set.rstrip('\n').split(" ")]
+            p = [int(val)-1 for val in set.rstrip('\n').rstrip("\r").rstrip(" ").split(" ")]
             bestSet.append(p)
         return bestScore, bestSet
     except:
@@ -78,8 +78,11 @@ def verifySolution(k, points, filename):
     Checks whether the solution provided in file is valid for points
     """
     solutionScore, solutionSet = getSolutionVals(filename)
-    ## TODO: need to check whether a point was used twice
-    return solutionScore == getSetsScore(points, solutionSet) and len(solutionSet) == k
+    if solutionScore:
+        ## TODO: need to check whether a point was used twice
+        return solutionScore == getSetsScore(points, solutionSet) and len(solutionSet) == k
+    else:
+        print("Error reading file {}".format(filename))
 
 def verifyInputOutputFileCombination(inputFile, outputFile):
     """
@@ -473,8 +476,8 @@ def verifyAllTheThings():
                     print("{} was good".format(fileName))
                 else:
                     print("{} was bad".format(fileName))
-            except:
-                print("{} crashed".format(fileName))
+            except Exception as e:
+                print("{} crashed because of {}".format(fileName, e))
 
 def testing():
 

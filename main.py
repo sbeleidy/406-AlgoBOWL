@@ -80,7 +80,12 @@ def verifySolution(k, points, filename):
     solutionScore, solutionSet = getSolutionVals(filename)
     if solutionScore:
         ## TODO: need to check whether a point was used twice
-        return solutionScore == getSetsScore(points, solutionSet) and len(solutionSet) == k
+        actualScore = getSetsScore(points, solutionSet)
+        if solutionScore == actualScore and len(solutionSet) == k:
+            return True
+        else:
+            print("{} Solution provided: {}, actual: {}".format(filename,solutionScore,actualScore))
+            return False
     else:
         print("Error reading file {}".format(filename))
 
@@ -541,4 +546,4 @@ def testing():
 
 # plotGroup(2)
 
-verifyAllTheThings()
+# verifyAllTheThings()

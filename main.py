@@ -3,8 +3,8 @@ import itertools
 import random
 
 import numpy as np
-#from mpl_toolkits.mplot3d import Axes3D
-#import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 
 import os
 
@@ -451,7 +451,7 @@ def solveAllTheThings(skip=False):
 
     for fileName in os.listdir("group_inputs"):
         if fileName.endswith(".txt"):
-            print("Starting on" + fileName)
+            print("Starting on " + fileName)
             if skip:
                 currentScore, currentSet = getSolutionVals("solutions/solution-"+fileName.lstrip("group_inputs/input_"))
                 if currentScore:
@@ -519,6 +519,6 @@ def testing():
 
 # testing()
 
-# solveAllTheThings(skip=True)
+solveAllTheThings(skip=True)
 
 # plotGroup(2)

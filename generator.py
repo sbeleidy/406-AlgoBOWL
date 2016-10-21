@@ -1,3 +1,5 @@
+import random
+
 
 def genSample(fileName):
     """
